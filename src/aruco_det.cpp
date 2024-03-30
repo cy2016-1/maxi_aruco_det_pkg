@@ -80,6 +80,8 @@ int main(int argc, char **argv)
         cv::Mat gray;
         cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
 
+        //opencv已经有现成的aruco二维码检测函数了，分为了两个步骤，先提前角点，再根据二维码角点估计相对位姿，分成两个函数我仔细想想也是有必要的，对于那种一张图里面有多张二维码时自己好灵活处理一些，同时，也方便了我们自己想弄PnP的，正好就直接用提取好的角点再用solvePnP函数算即可。
+
         // 检测ArUco二维码
         std::vector<int> markerIds;
         std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
