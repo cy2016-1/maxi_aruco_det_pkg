@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include "opencv2/highgui/highgui.hpp"
 #include <opencv2/aruco.hpp>
+#include <geometry_msgs/PoseStamped.h>
 
 #include <iostream>
 #include <chrono>
@@ -42,6 +43,8 @@ int main(int argc, char **argv)
     ros::Publisher aruco_det_image_pub = n.advertise<sensor_msgs::Image>("image_topic", 10);
     // 订阅灰度图像话题
     ros::Subscriber cam_sub = n.subscribe("/camera/infra1/image_rect_raw", 1, cam_imageCallback);
+
+    ros::Publisher aruco_det_pose_pub = n.advertise<geometry_msgs::PoseStamped>("/aruco/pose", 10);
 
     // 创建一个CvBridge对象
     cv_bridge::CvImage cv_image;
@@ -96,6 +99,16 @@ int main(int argc, char **argv)
             {
                 cv::aruco::drawAxis(frame, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
             }
+
+            geometry_msgs::PoseStamped aruco_det_pose;
+
+            aruco_det_pose.pose.position.x = tvecs[0][0];
+            aruco_det_pose.pose.position.y = tvecs[0][1];
+            aruco_det_pose.pose.position.z = tvecs[0][2];
+
+            aruco_det_pose.header.stamp = ros::Time::now();
+
+            aruco_det_pose_pub.publish(aruco_det_pose);  
         }
 
     cv_image.image = frame;
