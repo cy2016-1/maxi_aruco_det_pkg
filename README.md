@@ -7,6 +7,9 @@
 ```
 rosrun aruco_det aruco_det
 ```
+```
+roslaunch aruco_det aruco_det.launch
+```
 
 ## aruco detection without ros
 
