@@ -9,15 +9,16 @@
 #include <iostream>
 #include <chrono>
 
-
-cv::Mat frame;
+cv::Mat frame;  //初始化frame时不指定分辨率和类型，这样保证程序可以接受任意分辨率的图片，以及rgb图或者灰度图。  
+//cv::Mat frame = cv::Mat( 480, 640, CV_8UC3, cv::Scalar(0));;
 
 void cam_imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
     try
     {
         cv_bridge::CvImagePtr cv_ptr;
-        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
+        //cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
+        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
         //cv::Mat left_gray_image = cv_ptr->image;
         frame = cv_ptr->image;
 
@@ -40,9 +41,9 @@ int main(int argc, char **argv)
     ros::NodeHandle n;
 
     // 创建一个发布图像消息的发布者
-    ros::Publisher aruco_det_image_pub = n.advertise<sensor_msgs::Image>("image_topic", 10);
+    ros::Publisher aruco_det_image_pub = n.advertise<sensor_msgs::Image>("aruco_det_image", 10);
     // 订阅灰度图像话题
-    ros::Subscriber cam_sub = n.subscribe("/camera/infra1/image_rect_raw", 1, cam_imageCallback);
+    ros::Subscriber cam_sub = n.subscribe("/usb_cam/image_raw", 1, cam_imageCallback);
 
     ros::Publisher aruco_det_pose_pub = n.advertise<geometry_msgs::PoseStamped>("/aruco/pose", 10);
 
@@ -76,6 +77,9 @@ int main(int argc, char **argv)
     while (ros::ok())
     {
 
+        //没有frame.empty()这个判断，frame为空时cvtColor会报错。  
+        if(!frame.empty())
+        {
         // 转换为灰度图像
         cv::Mat gray;
         cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
@@ -113,13 +117,14 @@ int main(int argc, char **argv)
             aruco_det_pose_pub.publish(aruco_det_pose);  
         }
 
-    cv_image.image = frame;
-    //cv_image.encoding = "mono8";  //灰度图这里注意用mono8
-    //cv_image.encoding = "mono16";
-    cv_image.encoding = "bgr8";
-    sensor_msgs::ImagePtr img_msg = cv_image.toImageMsg();
+        cv_image.image = frame;
+        //cv_image.encoding = "mono8";  //灰度图这里注意用mono8
+        //cv_image.encoding = "mono16";
+        cv_image.encoding = "bgr8";
+        sensor_msgs::ImagePtr img_msg = cv_image.toImageMsg();
 
         aruco_det_image_pub.publish(img_msg);
+        }
         ros::spinOnce();
         loop_rate.sleep();
     }
