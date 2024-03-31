@@ -39,6 +39,11 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "aruco_det_node");
     ros::NodeHandle n;
+    ros::NodeHandle nh1("~");
+    int aruco_id;
+    float aruco_length;
+    nh1.param<int>("aruco_id", aruco_id, 19);
+    nh1.param<float>("aruco_length", aruco_length, 0.05);
 
     // 创建一个发布图像消息的发布者
     ros::Publisher aruco_det_image_pub = n.advertise<sensor_msgs::Image>("aruco_det_image", 10);
@@ -50,8 +55,8 @@ int main(int argc, char **argv)
     // 创建一个CvBridge对象
     cv_bridge::CvImage cv_image;
 
-    int aruco_id = 19;  //指定要检测的aruco二维码id  
-    float aruco_length = 0.05;  //二维码边长，单位米
+    //int aruco_id = 19;  //指定要检测的aruco二维码id  
+    //float aruco_length = 0.05;  //二维码边长，单位米
 
     // 定义ArUco字典和参数
     cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);

@@ -1,0 +1,9 @@
+<launch>
+  <node name="aruco_det" pkg="aruco_det" type="aruco_det" output="screen" >
+    <param name="aruco_id" value="19" />
+    <param name="aruco_length" value="0.05" />
+  </node>
+ 
+</launch>
+
+
