@@ -87,7 +87,7 @@ int main(int argc, char **argv)
         //opencv已经有现成的aruco二维码检测函数了，分为了两个步骤，先提前角点，再根据二维码角点估计相对位姿，分成两个函数我仔细想想也是有必要的，对于那种一张图里面有多张二维码时自己好灵活处理一些，同时，也方便了我们自己想弄PnP的，正好就直接用提取好的角点再用solvePnP函数算即可。
 
         // 检测ArUco二维码
-        std::vector<int> markerIds;
+        std::vector<int> markerIds;  //因为可能检测到多个aruco二维码，所以是vector类型。  
         std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
         cv::aruco::detectMarkers(gray, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
 
@@ -96,25 +96,45 @@ int main(int argc, char **argv)
         {
             cv::aruco::drawDetectedMarkers(frame, markerCorners, markerIds);
 
+            float aruco_length = 0.05;  //二维码边长，单位米
             // 估计相机姿态
             std::vector<cv::Vec3d> rvecs, tvecs;
-            cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
+            cv::aruco::estimatePoseSingleMarkers(markerCorners, aruco_length, cameraMatrix, distCoeffs, rvecs, tvecs);
 
+            //tvecs是aruco二维码中心点在相机坐标系下的坐标 参考：https://blog.csdn.net/weixin_46450859/article/details/133799263  
+            //rvecs应该是二维码坐标系在相机系下的旋转
             // 绘制相对位姿
             for (int i = 0; i < markerIds.size(); ++i)
             {
                 cv::aruco::drawAxis(frame, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
             }
 
+            // 要查找的值
+            int aruco_id = 19;
+
+            // 使用 std::find 在 vector 中查找值
+            auto it = std::find(markerIds.begin(), markerIds.end(), aruco_id);
+
+            // 检查是否找到
+            if (it != markerIds.end()) {
+               // 找到值的索引
+               int index = std::distance(markerIds.begin(), it);
+               std::cout << "aruco_id " << aruco_id << " found at index: " << index << std::endl;
+
             geometry_msgs::PoseStamped aruco_det_pose;
 
-            aruco_det_pose.pose.position.x = tvecs[0][0];
-            aruco_det_pose.pose.position.y = tvecs[0][1];
-            aruco_det_pose.pose.position.z = tvecs[0][2];
+            aruco_det_pose.pose.position.x = tvecs[index][0];
+            aruco_det_pose.pose.position.y = tvecs[index][1];
+            aruco_det_pose.pose.position.z = tvecs[index][2];
 
             aruco_det_pose.header.stamp = ros::Time::now();
 
             aruco_det_pose_pub.publish(aruco_det_pose);  
+
+            } else {
+               std::cout << "aruco_id " << aruco_id << " not found in the vector markerIds." << std::endl;
+            }
+
         }
 
         cv_image.image = frame;
