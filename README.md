@@ -4,9 +4,8 @@
 
 ## 使用方法
 
-```
-rosrun aruco_det aruco_det
-```
+相机内参和畸变参数在condig/camera.yaml里填写  
+aruco_det.launch里设置aruco字典，要识别的aruco二维码id，aruco二维码的边长。  
 ```
 roslaunch aruco_det aruco_det.launch
 ```
