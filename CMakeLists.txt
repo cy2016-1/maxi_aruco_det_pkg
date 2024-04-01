@@ -158,7 +158,7 @@ include_directories(
 
 
 add_executable(aruco_det src/aruco_det.cpp)
-target_link_libraries(aruco_det ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(aruco_det ${catkin_LIBRARIES} ${OpenCV_LIBS} yaml-cpp)
 
 #############
 ## Install ##

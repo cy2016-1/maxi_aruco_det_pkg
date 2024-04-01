@@ -2,6 +2,7 @@
   <node name="aruco_det" pkg="aruco_det" type="aruco_det" output="screen" >
     <param name="aruco_id" value="19" />
     <param name="aruco_length" value="0.05" />
+    <param name="camera_param_path" value="/home/maxi/maxi_aruco_det_ws/src/maxi_aruco_det_pkg/config/camera.yaml" />
   </node>
  
 </launch>

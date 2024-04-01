@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <yaml-cpp/yaml.h>
 
 cv::Mat frame;  //初始化frame时不指定分辨率和类型，这样保证程序可以接受任意分辨率的图片，以及rgb图或者灰度图。  
 //cv::Mat frame = cv::Mat( 480, 640, CV_8UC3, cv::Scalar(0));;
@@ -42,8 +43,10 @@ int main(int argc, char **argv)
     ros::NodeHandle nh1("~");
     int aruco_id;
     float aruco_length;
+    std::string camera_param_path;
     nh1.param<int>("aruco_id", aruco_id, 19);
     nh1.param<float>("aruco_length", aruco_length, 0.05);
+    nh1.param<std::string>("camera_param_path", camera_param_path, "/home/maxi/maxi_aruco_det_ws/src/maxi_aruco_det_pkg/config/camera.yaml");
 
     // 创建一个发布图像消息的发布者
     ros::Publisher aruco_det_image_pub = n.advertise<sensor_msgs::Image>("aruco_det_image", 10);
@@ -62,17 +65,32 @@ int main(int argc, char **argv)
     cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
     cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
 
+    // 加载 YAML 文件
+    //YAML::Node config = YAML::LoadFile("/home/maxi/maxi_aruco_det_ws/src/maxi_aruco_det_pkg/config/camera.yaml");
+    YAML::Node config = YAML::LoadFile(camera_param_path);
 
-    double fx = 406.932130;
-    double fy = 402.678201;
-    double cx = 316.629381;
-    double cy = 242.533947;
+    // 读取参数值
+    double fx = config["fx"].as<double>();
+    double fy = config["fy"].as<double>();
+    double cx = config["x0"].as<double>();
+    double cy = config["y0"].as<double>();
 
-    double k1 = 0.039106;
-    double k2 = -0.056494;
-    double p1 = -0.000824;
-    double p2 = 0.092161;
-    double k3 = 0.0;
+    double k1 = config["k1"].as<double>();
+    double k2 = config["k2"].as<double>();
+    double p1 = config["p1"].as<double>();
+    double p2 = config["p2"].as<double>();
+    double k3 = config["k3"].as<double>();
+
+    //double fx = 406.932130;
+    //double fy = 402.678201;
+    //double cx = 316.629381;
+    //double cy = 242.533947;
+
+    //double k1 = 0.039106;
+    //double k2 = -0.056494;
+    //double p1 = -0.000824;
+    //double p2 = 0.092161;
+    //double k3 = 0.0;
 
     cv::Mat cameraMatrix = (cv::Mat_<double>(3, 3) << 
     fx, 0, cx,
