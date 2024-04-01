@@ -41,9 +41,11 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "aruco_det_node");
     ros::NodeHandle n;
     ros::NodeHandle nh1("~");
+    int dictionary_id;
     int aruco_id;
     float aruco_length;
     std::string camera_param_path;
+    nh1.param<int>("dictionary_id", dictionary_id, 10);
     nh1.param<int>("aruco_id", aruco_id, 19);
     nh1.param<float>("aruco_length", aruco_length, 0.05);
     nh1.param<std::string>("camera_param_path", camera_param_path, "/home/maxi/maxi_aruco_det_ws/src/maxi_aruco_det_pkg/config/camera.yaml");
@@ -62,7 +64,10 @@ int main(int argc, char **argv)
     //float aruco_length = 0.05;  //二维码边长，单位米
 
     // 定义ArUco字典和参数
-    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+    //aruco字典序号可参考 https://docs.opencv.org/3.4/dc/df7/dictionary_8hpp.html  
+    //cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+    //cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(10);
+    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(dictionary_id);
     cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
 
     // 加载 YAML 文件
@@ -99,7 +104,7 @@ int main(int argc, char **argv)
 
     cv::Mat distCoeffs = (cv::Mat_<double>(5, 1) << k1, k2, p1, p2, k3);
 
-    ros::Rate loop_rate(10);  // 设置发布频率为1Hz
+    ros::Rate loop_rate(10);  // 设置发布频率
     while (ros::ok())
     {
 
