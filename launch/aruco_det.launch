@@ -3,7 +3,8 @@
     <param name="dictionary_id" value="10" />
     <param name="aruco_id" value="19" />
     <param name="aruco_length" value="0.05" />
-    <param name="camera_param_path" value="/home/maxi/maxi_aruco_det_ws/src/maxi_aruco_det_pkg/config/camera.yaml" />
+    <param name="camera_param_path" value="$(find aruco_det)/config/camera.yaml" />
+    <param name="sub_image_topic" value="/usb_cam/image_raw" />
   </node>
  
 </launch>

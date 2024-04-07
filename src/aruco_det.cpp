@@ -45,15 +45,18 @@ int main(int argc, char **argv)
     int aruco_id;
     float aruco_length;
     std::string camera_param_path;
+    std::string sub_image_topic;
     nh1.param<int>("dictionary_id", dictionary_id, 10);
     nh1.param<int>("aruco_id", aruco_id, 19);
     nh1.param<float>("aruco_length", aruco_length, 0.05);
     nh1.param<std::string>("camera_param_path", camera_param_path, "/home/maxi/maxi_aruco_det_ws/src/maxi_aruco_det_pkg/config/camera.yaml");
+    nh1.param<std::string>("sub_image_topic", sub_image_topic, "/usb_cam/image_raw");
 
     // 创建一个发布图像消息的发布者
     ros::Publisher aruco_det_image_pub = n.advertise<sensor_msgs::Image>("aruco_det_image", 10);
-    // 订阅灰度图像话题
-    ros::Subscriber cam_sub = n.subscribe("/usb_cam/image_raw", 1, cam_imageCallback);
+    // 订阅图像话题
+    //ros::Subscriber cam_sub = n.subscribe("/usb_cam/image_raw", 1, cam_imageCallback);
+    ros::Subscriber cam_sub = n.subscribe(sub_image_topic, 1, cam_imageCallback);
 
     ros::Publisher aruco_det_pose_pub = n.advertise<geometry_msgs::PoseStamped>("/aruco/pose", 10);
 
@@ -157,6 +160,11 @@ int main(int argc, char **argv)
             aruco_det_pose.pose.position.x = tvecs[index][0];
             aruco_det_pose.pose.position.y = tvecs[index][1];
             aruco_det_pose.pose.position.z = tvecs[index][2];
+
+            aruco_det_pose.pose.orientation.x = rvecs[index][0];
+            aruco_det_pose.pose.orientation.y = rvecs[index][1];
+            aruco_det_pose.pose.orientation.z = rvecs[index][2];
+            aruco_det_pose.pose.orientation.w = 0;
 
             aruco_det_pose.header.stamp = ros::Time::now();
 

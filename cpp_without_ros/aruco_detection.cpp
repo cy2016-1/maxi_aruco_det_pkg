@@ -32,7 +32,7 @@ int main()
 
 
     // 打开相机
-    cv::VideoCapture cap(0);
+    cv::VideoCapture cap(2);
     if (!cap.isOpened())
     {
         std::cout << "无法打开相机" << std::endl;
@@ -45,7 +45,7 @@ int main()
         cv::Mat frame;
         cap >> frame;
 
-        // 转换为灰度图像
+        // 转换为灰度图像，非必要
         cv::Mat gray;
         cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
 
@@ -53,6 +53,7 @@ int main()
         std::vector<int> markerIds;
         std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
         cv::aruco::detectMarkers(gray, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
+        //cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
 
         // 绘制检测结果
         if (markerIds.size() > 0)
@@ -71,7 +72,7 @@ int main()
             );
             *********************************************************/
             std::vector<cv::Vec3d> rvecs, tvecs;
-            float arucoLength = 0.19; //aruco二维码边长
+            float arucoLength = 0.05; //aruco二维码边长
             cv::aruco::estimatePoseSingleMarkers(markerCorners, arucoLength, cameraMatrix, distCoeffs, rvecs, tvecs);
             for (int i = 0; i < markerIds.size(); ++i)
             {
