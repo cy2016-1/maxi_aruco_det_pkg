@@ -161,10 +161,26 @@ int main(int argc, char **argv)
             aruco_det_pose.pose.position.y = tvecs[index][1];
             aruco_det_pose.pose.position.z = tvecs[index][2];
 
-            aruco_det_pose.pose.orientation.x = rvecs[index][0];
-            aruco_det_pose.pose.orientation.y = rvecs[index][1];
-            aruco_det_pose.pose.orientation.z = rvecs[index][2];
-            aruco_det_pose.pose.orientation.w = 0;
+            cv::Mat rotation_vector = (cv::Mat_<double>(3, 1) << rvecs[index][0], rvecs[index][1], rvecs[index][2]);
+            // 将旋转向量转换为旋转矩阵
+            cv::Mat rotation_matrix;
+            cv::Rodrigues(rotation_vector, rotation_matrix);
+
+            // 旋转矩阵转为四元数
+            double w = std::sqrt(1 + rotation_matrix.at<double>(0, 0) + rotation_matrix.at<double>(1, 1) + rotation_matrix.at<double>(2, 2)) / 2;
+            double x = (rotation_matrix.at<double>(2, 1) - rotation_matrix.at<double>(1, 2)) / (4 * w);
+            double y = (rotation_matrix.at<double>(0, 2) - rotation_matrix.at<double>(2, 0)) / (4 * w);
+            double z = (rotation_matrix.at<double>(1, 0) - rotation_matrix.at<double>(0, 1)) / (4 * w);
+
+            aruco_det_pose.pose.orientation.x = x;
+            aruco_det_pose.pose.orientation.y = y;
+            aruco_det_pose.pose.orientation.z = z;
+            aruco_det_pose.pose.orientation.w = w;
+
+            //aruco_det_pose.pose.orientation.x = rvecs[index][0];
+            //aruco_det_pose.pose.orientation.y = rvecs[index][1];
+            //aruco_det_pose.pose.orientation.z = rvecs[index][2];
+            //aruco_det_pose.pose.orientation.w = 0;
 
             aruco_det_pose.header.stamp = ros::Time::now();
 
