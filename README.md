@@ -5,7 +5,7 @@
 ## 使用方法
 
 相机内参和畸变参数在condig/camera.yaml里填写  
-aruco_det.launch里设置aruco字典，要识别的aruco二维码id，aruco二维码的边长，订阅的图像话题名称。  
+aruco_det.launch里设置aruco字典，要识别的aruco二维码id，aruco二维码的边长(单位米)，订阅的图像话题名称。  
 ```
 roslaunch aruco_det aruco_det.launch
 ```
