@@ -161,6 +161,7 @@ int main(int argc, char **argv)
             aruco_det_pose.pose.position.y = tvecs[index][1];
             aruco_det_pose.pose.position.z = tvecs[index][2];
 
+            // 取出对应旋转向量
             cv::Mat rotation_vector = (cv::Mat_<double>(3, 1) << rvecs[index][0], rvecs[index][1], rvecs[index][2]);
             // 将旋转向量转换为旋转矩阵
             cv::Mat rotation_matrix;
