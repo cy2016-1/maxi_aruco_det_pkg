@@ -10,7 +10,8 @@ aruco_det.launch里设置aruco字典，要识别的aruco二维码id，aruco二�
 roslaunch aruco_det aruco_det.launch
 ```
 
-aruco二维码检测得到的平移向量和旋转向量存放在了/aruco/pose话题里发布出来，可以订阅使用。  
+aruco二维码检测得到的平移向量和旋转向量对应的四元数存放在了geometry_msgs::PoseStamped类型的/aruco/pose话题里发布出来，可以订阅使用。  
+注意aruco二维码检测得到的位姿是相机系下的aruco坐标系的旋转平移。  
 
 ## aruco detection without ros
 
